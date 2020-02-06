@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public class GoBoard implements Serializable {
+    private static GoBoard instance = null;
     private List<List<Space>> spaces;
 
     private HashSet<Space> visited;
@@ -22,7 +23,9 @@ public class GoBoard implements Serializable {
         }
     }
 
-    public List<List<Space>> getSpaces(){
+
+
+    public List<List<Space>> getSpaces() {
         return this.spaces;
     }
 
@@ -42,7 +45,6 @@ public class GoBoard implements Serializable {
         for(int i = 0; i < this.spaces.size(); i++){
             for(int j = 0; j < this.spaces.size(); j++){
                 this.visited = new HashSet<Space>();
-                System.out.println("Space: " + i + "," + j);
                 this.getSpace(i,j).setLiberties(this.getLiberties(i,j));
             }
         }
@@ -79,7 +81,6 @@ public class GoBoard implements Serializable {
                     liberties.addAll(this.getLiberties(neighbor.getX(), neighbor.getY()));
                 }
                 else if (neighbor.getValue() == 0){
-                    System.out.println("FOUND LIBERTY");
                     liberties.add(neighbor);
                 }
             }
