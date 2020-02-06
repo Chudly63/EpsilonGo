@@ -99,7 +99,7 @@ public class GameView extends View{
         return icon;
     }
 
-    public GoBoard updateBoardPanel(GoBoard currentBoard, List<Space> updatedSpaces){
+    public void updateBoardPanel(GoBoard currentBoard, List<Space> updatedSpaces){
         boolean highlightFound = false;
         for(Space space : updatedSpaces){
             ImageIcon icon = this.getBoardButtonIcon(space.getX(), space.getY(), space.getValue(), currentBoard.getBoardLength());
@@ -124,7 +124,6 @@ public class GameView extends View{
             timer.setRepeats(false);
             timer.start();
         }
-        return currentBoard;
     }
 
     private JPanel createBoardPanel(GoBoard currentBoard){
@@ -178,6 +177,10 @@ public class GameView extends View{
             }
         });
         toolBar.add(quitBtn);
+        JButton resetBtn = new JButton("R");
+        resetBtn.addActionListener(this.controller);
+        resetBtn.setActionCommand("Reset");
+        toolBar.add(resetBtn);
         return toolBar;
     }
 

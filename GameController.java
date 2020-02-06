@@ -47,6 +47,11 @@ public class GameController extends Controller implements ActionListener{
             board.updateLiberties();
             view.updateBoardPanel(board, collectedSpaces);
         }
+        else if(e.getActionCommand().equals("Reset")){
+            board.resetBoard();
+            currentPlayer = 1;
+            view.updateBoardPanel(board, board.getAllSpaces());
+        }
         else{
             int otherPlayer = currentPlayer == 1 ? 2 : 1;
             int x = Integer.parseInt(e.getActionCommand().split(":")[0]);
@@ -73,7 +78,7 @@ public class GameController extends Controller implements ActionListener{
 
             spacesToUpdate.add(selected);
             spacesToUpdate.addAll(captures);
-            board = view.updateBoardPanel(board, spacesToUpdate); 
+            view.updateBoardPanel(board, spacesToUpdate); 
             
         }
     }   

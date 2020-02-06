@@ -23,10 +23,28 @@ public class GoBoard extends Model implements Serializable {
         }
     }
 
+    public void resetBoard(){
+        for(List<Space> row : this.spaces){
+            for(Space space : row){
+                space.setValue(0);
+            }
+        }
+    }
+
 
 
     public List<List<Space>> getSpaces() {
         return this.spaces;
+    }
+
+    public List<Space> getAllSpaces() {
+        List<Space> spaces = new ArrayList<Space>();
+        for(List<Space> row : this.spaces){
+            for(Space space : row){
+                spaces.add(space);
+            }
+        }
+        return spaces;
     }
 
     public Space getSpace(int x, int y){
