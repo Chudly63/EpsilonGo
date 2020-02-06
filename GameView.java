@@ -1,15 +1,12 @@
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
@@ -23,43 +20,35 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class GameView {
+public class GameView extends View{
 
     private HashMap<String, ArrayList<ImageIcon>> ICONS = new HashMap<String, ArrayList<ImageIcon>>();
     private String[] fileNames = {"north-west", "north", "north-east", "west", "center", "east", "south-west", "south", "south-east", "dot"};
-    private Controller controller;
+    private GameController controller;
     private ArrayList<ArrayList<JButton>> boardButtons;
 
-    JFrame jFrame = new JFrame("EpsilonGo");
-    
-    JPanel jPanel = new JPanel();
-    JPanel boardPanel = new JPanel();
     JPanel glassPanel = new JPanel();
 
-    public GameView(Controller controller){
+    public GameView(GameController controller){
         this.controller = controller;
         this.boardButtons = new ArrayList<ArrayList<JButton>>();
         for(String fileName : fileNames){
-            ImageIcon blank = new ImageIcon("assets/img/" + fileName + ".png");
-            ImageIcon black = new ImageIcon("assets/img/" + fileName + "-b.png");
-            ImageIcon white = new ImageIcon("assets/img/" + fileName + "-w.png");
-            ImageIcon red = new ImageIcon("assets/img/" + fileName + "-r.png");
             ArrayList<ImageIcon> currentIcons = new ArrayList<ImageIcon>();
-            currentIcons.add(blank);
-            currentIcons.add(black);
-            currentIcons.add(white);
-            currentIcons.add(red);
+            currentIcons.add(new ImageIcon("assets/img/" + fileName + ".png"));
+            currentIcons.add(new ImageIcon("assets/img/" + fileName + "-b.png"));
+            currentIcons.add(new ImageIcon("assets/img/" + fileName + "-w.png"));
+            currentIcons.add(new ImageIcon("assets/img/" + fileName + "-r.png"));
             ICONS.put(fileName, currentIcons);
         }
     }
 
     private ImageIcon getBoardButtonIcon(int x, int y, int value, int length){
         ImageIcon icon = new ImageIcon();
+        //Top Row
         if(y == 0){
             if(x == 0){
                 icon = ICONS.get("north-west").get(value);
@@ -71,6 +60,7 @@ public class GameView {
                 icon = ICONS.get("north").get(value);
             }
         }
+        //Bottom Row
         else if (y == length - 1){
             if(x == 0){
                 icon = ICONS.get("south-west").get(value);
@@ -83,18 +73,22 @@ public class GameView {
             }
         }
         else{
+            //Left Wall
             if(x == 0){
                 icon = ICONS.get("west").get(value);
             }
+            //Right Wall
             else if(x == length - 1){
                 icon = ICONS.get("east").get(value);
             }
             else{
+                //Dot locations
                 int gap = length / 7 + 1;
                 if((x == length / 2 || x == gap || x == length - (gap+1)) && 
                     (y == length / 2 || y == gap || y == length - (gap+1))){
                     icon = ICONS.get("dot").get(value);
                 }
+                //Intersections
                 else
                     icon = ICONS.get("center").get(value);
             }
@@ -133,10 +127,10 @@ public class GameView {
         return currentBoard;
     }
 
-    private void createBoardPanel(GoBoard currentBoard){
+    private JPanel createBoardPanel(GoBoard currentBoard){
         this.boardButtons = new ArrayList<ArrayList<JButton>>();
-        this.boardPanel = new JPanel();
-        this.boardPanel.setLayout(new GridLayout(currentBoard.getBoardLength(),currentBoard.getBoardLength()));
+        JPanel boardPanel = new JPanel();
+        boardPanel.setLayout(new GridLayout(currentBoard.getBoardLength(),currentBoard.getBoardLength()));
 
         for(int i = 0; i < currentBoard.getBoardLength(); i++){
             ArrayList<JButton> boardRow = new ArrayList<JButton>();
@@ -148,18 +142,17 @@ public class GameView {
                 select.setBorderPainted(false);
                 select.addActionListener(this.controller);
                 select.setActionCommand(j + ":" + i);
-                this.boardPanel.add(select);
+                boardPanel.add(select);
                 boardRow.add(select);
             }
             this.boardButtons.add(boardRow);
         }
-        this.boardPanel.setPreferredSize(new Dimension(800,800));
-        jPanel.add(this.boardPanel, BorderLayout.CENTER);
+        boardPanel.setPreferredSize(new Dimension(800,800));
+        boardPanel.setSize(boardPanel.getPreferredSize());
+        return boardPanel;
     }
 
-    public void showView(GoBoard currentBoard){
-        jPanel.setLayout(new BorderLayout());
-
+    private JMenuBar createMenu(){
         JMenuBar menuBar = new JMenuBar();
         JMenu file = new JMenu("File");
         file.setMnemonic(KeyEvent.VK_F);
@@ -173,9 +166,10 @@ public class GameView {
 
         file.add(quit);
         menuBar.add(file);
-        jFrame.setJMenuBar(menuBar);
+        return menuBar;
+    }
 
-
+    private JToolBar createToolBar(){
         JToolBar toolBar = new JToolBar();
         JButton quitBtn = new JButton("Q");
         quitBtn.addActionListener(new ActionListener(){
@@ -184,42 +178,47 @@ public class GameView {
             }
         });
         toolBar.add(quitBtn);
-        jPanel.add(toolBar, BorderLayout.NORTH);
+        return toolBar;
+    }
 
-        
+    private JPanel createPlayerPanel(){
+        JPanel playerPanel = new JPanel();
+        playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
+        JButton pass = new JButton("Pass");
 
+        playerPanel.add(pass);
+        return playerPanel;
+    }
 
-        JPanel left = new JPanel();
-        left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
-        JButton leftButton = new JButton("Pass");
-
-        left.add(leftButton);
-        jPanel.add(left, BorderLayout.LINE_START);
-
-        JPanel right = new JPanel();
-        right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
-        JButton rightButton = new JButton("Pass");
-
-        right.add(rightButton);
-        jPanel.add(right, BorderLayout.LINE_END);
-
-        createBoardPanel(currentBoard);
-
+    private void createGlassPanel(){
         this.glassPanel.setOpaque(false);
         this.glassPanel.setVisible(false);
         this.glassPanel.addMouseListener(new MouseAdapter() {});
         this.glassPanel.setFocusable(true);
         this.glassPanel.setPreferredSize(new Dimension(800,800));
         this.glassPanel.setSize(this.glassPanel.getPreferredSize());
+    }
 
-        JLayeredPane top = new JLayeredPane();
-        top.setPreferredSize(new Dimension(800,800));
-        this.boardPanel.setSize(this.boardPanel.getPreferredSize());
-        top.add(this.boardPanel, JLayeredPane.DEFAULT_LAYER);
-        top.add(this.glassPanel, JLayeredPane.PALETTE_LAYER);
+    private JLayeredPane createLayeredPane(JPanel boardPanel, JPanel glassPanel){
+        JLayeredPane layeredPanel = new JLayeredPane();
+        layeredPanel.setPreferredSize(new Dimension(800,800));
+        layeredPanel.add(boardPanel, JLayeredPane.DEFAULT_LAYER);
+        layeredPanel.add(glassPanel, JLayeredPane.PALETTE_LAYER);
+        return layeredPanel;
+    }
 
-        jPanel.add(top, BorderLayout.CENTER);
+    public void showView(GoBoard currentBoard){
+        JFrame jFrame = new JFrame("EpsilonGo");
+        jFrame.setJMenuBar(this.createMenu());
+        
+        JPanel jPanel = new JPanel();
+        jPanel.setLayout(new BorderLayout());
+        jPanel.add(this.createToolBar(), BorderLayout.NORTH);
+        jPanel.add(createPlayerPanel(), BorderLayout.LINE_START);
+        jPanel.add(createPlayerPanel(), BorderLayout.LINE_END);
 
+        createGlassPanel();
+        jPanel.add(createLayeredPane(createBoardPanel(currentBoard), this.glassPanel), BorderLayout.CENTER);
 
         jFrame.add(jPanel, BorderLayout.CENTER);
         jFrame.pack();

@@ -3,10 +3,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class GoBoard implements Serializable {
-    private static GoBoard instance = null;
+public class GoBoard extends Model implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
     private List<List<Space>> spaces;
-
     private HashSet<Space> visited;
 
 
