@@ -4,6 +4,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -11,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -19,13 +21,17 @@ import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class GameView {
 
     private HashMap<String, ArrayList<ImageIcon>> ICONS = new HashMap<String, ArrayList<ImageIcon>>();
-    private String[] fileNames = {"north-west", "north", "north-east", "west", "center", "east", "south-west", "south", "south-east"};
+    private String[] fileNames = {"north-west", "north", "north-east", "west", "center", "east", "south-west", "south", "south-east", "dot"};
     private Controller controller;
     private ArrayList<ArrayList<JButton>> boardButtons;
 
@@ -33,6 +39,7 @@ public class GameView {
     
     JPanel jPanel = new JPanel();
     JPanel boardPanel = new JPanel();
+    JPanel glassPanel = new JPanel();
 
     public GameView(Controller controller){
         this.controller = controller;
@@ -41,57 +48,89 @@ public class GameView {
             ImageIcon blank = new ImageIcon("assets/img/" + fileName + ".png");
             ImageIcon black = new ImageIcon("assets/img/" + fileName + "-b.png");
             ImageIcon white = new ImageIcon("assets/img/" + fileName + "-w.png");
+            ImageIcon red = new ImageIcon("assets/img/" + fileName + "-r.png");
             ArrayList<ImageIcon> currentIcons = new ArrayList<ImageIcon>();
             currentIcons.add(blank);
-            currentIcons.add(white);
             currentIcons.add(black);
+            currentIcons.add(white);
+            currentIcons.add(red);
             ICONS.put(fileName, currentIcons);
         }
     }
 
-    public void updateBoardPanel(GoBoard currentBoard){
-        for(int i = 0; i < currentBoard.getBoardLength(); i++){
-            for(int j = 0; j < currentBoard.getBoardLength(); j++){
-                ImageIcon icon = new ImageIcon();
-                if(i == 0){
-                    if(j == 0){
-                        icon = ICONS.get("north-west").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else if(j == currentBoard.getBoardLength() - 1){
-                        icon = ICONS.get("north-east").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else{
-                        icon = ICONS.get("north").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                }
-                else if (i == currentBoard.getBoardLength() - 1){
-                    if(j == 0){
-                        icon = ICONS.get("south-west").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else if(j == currentBoard.getBoardLength() - 1){
-                        icon = ICONS.get("south-east").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else{
-                        icon = ICONS.get("south").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                }
-                else{
-                    if(j == 0){
-                        icon = ICONS.get("west").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else if(j == currentBoard.getBoardLength() - 1){
-                        icon = ICONS.get("east").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else{
-                        icon = ICONS.get("center").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                }
-                Image img = icon.getImage();
-                Image newimg = img.getScaledInstance( 800 / currentBoard.getBoardLength(), 800 / currentBoard.getBoardLength(),  java.awt.Image.SCALE_SMOOTH ) ;  
-                icon = new ImageIcon( newimg );
-                this.boardButtons.get(i).get(j).setIcon(icon);
+    private ImageIcon getBoardButtonIcon(int x, int y, int value, int length){
+        ImageIcon icon = new ImageIcon();
+        if(y == 0){
+            if(x == 0){
+                icon = ICONS.get("north-west").get(value);
+            }
+            else if(x == length - 1){
+                icon = ICONS.get("north-east").get(value);
+            }
+            else{
+                icon = ICONS.get("north").get(value);
             }
         }
+        else if (y == length - 1){
+            if(x == 0){
+                icon = ICONS.get("south-west").get(value);
+            }
+            else if(x == length - 1){
+                icon = ICONS.get("south-east").get(value);
+            }
+            else{
+                icon = ICONS.get("south").get(value);
+            }
+        }
+        else{
+            if(x == 0){
+                icon = ICONS.get("west").get(value);
+            }
+            else if(x == length - 1){
+                icon = ICONS.get("east").get(value);
+            }
+            else{
+                int gap = length / 7 + 1;
+                if((x == length / 2 || x == gap || x == length - (gap+1)) && 
+                    (y == length / 2 || y == gap || y == length - (gap+1))){
+                    icon = ICONS.get("dot").get(value);
+                }
+                else
+                    icon = ICONS.get("center").get(value);
+            }
+        }
+        Image img = icon.getImage();
+        Image newimg = img.getScaledInstance( 800 / length, 800 / length,  java.awt.Image.SCALE_SMOOTH ) ;  
+        icon = new ImageIcon( newimg );
+        return icon;
+    }
+
+    public GoBoard updateBoardPanel(GoBoard currentBoard, List<Space> updatedSpaces){
+        boolean highlightFound = false;
+        for(Space space : updatedSpaces){
+            ImageIcon icon = this.getBoardButtonIcon(space.getX(), space.getY(), space.getValue(), currentBoard.getBoardLength());
+            JButton spaceButton = this.boardButtons.get(space.getY()).get(space.getX());
+            spaceButton.setIcon(icon);
+            spaceButton.setDisabledIcon(icon);
+            switch(space.getValue()){
+                case 3:
+                    highlightFound = true;
+                case 1:
+                case 2:
+                    spaceButton.setEnabled(false);
+                    break;
+                case 0:
+                    spaceButton.setEnabled(true);
+            }
+        }
+        this.glassPanel.setVisible(highlightFound);
+        if(highlightFound){
+            Timer timer = new Timer(1000, controller);
+            timer.setActionCommand("Update");
+            timer.setRepeats(false);
+            timer.start();
+        }
+        return currentBoard;
     }
 
     private void createBoardPanel(GoBoard currentBoard){
@@ -103,44 +142,7 @@ public class GameView {
             ArrayList<JButton> boardRow = new ArrayList<JButton>();
             for(int j = 0; j < currentBoard.getBoardLength(); j++){
                 JButton select = new JButton();
-                ImageIcon icon = new ImageIcon();
-                if(i == 0){
-                    if(j == 0){
-                        icon = ICONS.get("north-west").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else if(j == currentBoard.getBoardLength() - 1){
-                        icon = ICONS.get("north-east").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else{
-                        icon = ICONS.get("north").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                }
-                else if (i == currentBoard.getBoardLength() - 1){
-                    if(j == 0){
-                        icon = ICONS.get("south-west").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else if(j == currentBoard.getBoardLength() - 1){
-                        icon = ICONS.get("south-east").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else{
-                        icon = ICONS.get("south").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                }
-                else{
-                    if(j == 0){
-                        icon = ICONS.get("west").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else if(j == currentBoard.getBoardLength() - 1){
-                        icon = ICONS.get("east").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                    else{
-                        icon = ICONS.get("center").get(currentBoard.getSpace(j,i).getValue());
-                    }
-                }
-                Image img = icon.getImage();
-                Image newimg = img.getScaledInstance( 800 / currentBoard.getBoardLength(), 800 / currentBoard.getBoardLength(),  java.awt.Image.SCALE_SMOOTH ) ;  
-                icon = new ImageIcon( newimg );
-                select.setIcon(icon);
+                select.setIcon(this.getBoardButtonIcon(j, i, currentBoard.getSpace(j,i).getValue(), currentBoard.getBoardLength()));
                 select.setOpaque(false);
                 select.setContentAreaFilled(false);
                 select.setBorderPainted(false);
@@ -157,7 +159,6 @@ public class GameView {
 
     public void showView(GoBoard currentBoard){
         jPanel.setLayout(new BorderLayout());
-
 
         JMenuBar menuBar = new JMenuBar();
         JMenu file = new JMenu("File");
@@ -204,9 +205,23 @@ public class GameView {
 
         createBoardPanel(currentBoard);
 
-        jPanel.add(this.boardPanel, BorderLayout.CENTER);
+        this.glassPanel.setOpaque(false);
+        this.glassPanel.setVisible(false);
+        this.glassPanel.addMouseListener(new MouseAdapter() {});
+        this.glassPanel.setFocusable(true);
+        this.glassPanel.setPreferredSize(new Dimension(800,800));
+        this.glassPanel.setSize(this.glassPanel.getPreferredSize());
 
-        jFrame.add(jPanel);
+        JLayeredPane top = new JLayeredPane();
+        top.setPreferredSize(new Dimension(800,800));
+        this.boardPanel.setSize(this.boardPanel.getPreferredSize());
+        top.add(this.boardPanel, JLayeredPane.DEFAULT_LAYER);
+        top.add(this.glassPanel, JLayeredPane.PALETTE_LAYER);
+
+        jPanel.add(top, BorderLayout.CENTER);
+
+
+        jFrame.add(jPanel, BorderLayout.CENTER);
         jFrame.pack();
         jFrame.setVisible(true);
     }

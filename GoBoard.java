@@ -85,8 +85,34 @@ public class GoBoard implements Serializable {
                 }
             }
         }
-
         return liberties;
+    }
+
+    public List<Space> highlightCaptures(int capturedPlayer){
+        ArrayList<Space> capturesFound = new ArrayList<Space>();
+        for(List<Space> row : this.spaces){
+            for(Space space : row){
+                this.visited = new HashSet<Space>();
+                if(space.getValue() == capturedPlayer && getLiberties(space.getX(), space.getY()).size() == 0){
+                    space.setValue(3);
+                    capturesFound.add(space);
+                }
+            }
+        }
+        return capturesFound;
+    }
+
+    public List<Space> collectCaptures(){
+        ArrayList<Space> captures = new ArrayList<Space>();
+        for(List<Space> row : this.spaces){
+            for(Space space : row){
+                if(space.getValue() == 3){
+                    space.setValue(0);
+                    captures.add(space);
+                }
+            }
+        }
+        return captures;
     }
 
     public String toString(){
