@@ -39,6 +39,8 @@ public class GameView extends View{
     JPanel blackPanel;
     JPanel whitePanel;
 
+    JLabel currentPlayerLabel;
+
     
     Icon black = new ImageIcon("assets/img/black.png");
     Icon white = new ImageIcon("assets/img/white.png");
@@ -194,6 +196,13 @@ public class GameView extends View{
         return toolBar;
     }
 
+    private JPanel createBottomPanel(){
+        JPanel bottomPanel = new JPanel();
+        this.currentPlayerLabel = new JLabel("Current Turn: Black");
+        bottomPanel.add(this.currentPlayerLabel);
+        return bottomPanel;
+    }
+
     private JPanel createPlayerPanel(int player, GoBoard currentBoard){
         HashMap<String, JComponent> components = new HashMap<String, JComponent>();
         JPanel playerPanel = new JPanel();
@@ -256,7 +265,8 @@ public class GameView extends View{
         pass.setEnabled(false);
 
         //Display active player
-
+        String currentPlayerText = activePlayer == 1 ? "Current Player: Black" : "Current Player: White";
+        this.currentPlayerLabel.setText(currentPlayerText);
     }
 
     private void createGlassPanel(){
@@ -287,6 +297,7 @@ public class GameView extends View{
         this.whitePanel = createPlayerPanel(2, currentBoard);
         jPanel.add(this.blackPanel, BorderLayout.LINE_START);
         jPanel.add(this.whitePanel, BorderLayout.LINE_END);
+        jPanel.add(this.createBottomPanel(), BorderLayout.SOUTH);
 
         createGlassPanel();
         jPanel.add(createLayeredPane(createBoardPanel(currentBoard), this.glassPanel), BorderLayout.CENTER);
