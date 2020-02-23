@@ -60,6 +60,7 @@ public class GameController extends Controller{
             view.updatePlayerPanel(1, board);
             view.updatePlayerPanel(2, board);
             view.setActivePlayer(board.getCurrentPlayer());
+            passLastTurn = false;
         }
         else if(e.getActionCommand().equals("Pass")){
             if(passLastTurn){

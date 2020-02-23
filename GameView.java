@@ -31,6 +31,8 @@ import java.util.List;
 
 public class GameView extends View{
 
+    private int BOARD_SIZE = 600;
+
     private HashMap<String, ArrayList<ImageIcon>> ICONS = new HashMap<String, ArrayList<ImageIcon>>();
     private String[] fileNames = {"north-west", "north", "north-east", "west", "center", "east", "south-west", "south", "south-east", "dot"};
     private GameController controller;
@@ -108,7 +110,7 @@ public class GameView extends View{
             }
         }
         Image img = icon.getImage();
-        Image newimg = img.getScaledInstance( 800 / length, 800 / length,  java.awt.Image.SCALE_SMOOTH ) ;  
+        Image newimg = img.getScaledInstance( BOARD_SIZE / length, BOARD_SIZE / length,  java.awt.Image.SCALE_SMOOTH ) ;  
         icon = new ImageIcon( newimg );
         return icon;
     }
@@ -160,7 +162,7 @@ public class GameView extends View{
             }
             this.boardButtons.add(boardRow);
         }
-        boardPanel.setPreferredSize(new Dimension(800,800));
+        boardPanel.setPreferredSize(new Dimension(BOARD_SIZE,BOARD_SIZE));
         boardPanel.setSize(boardPanel.getPreferredSize());
         return boardPanel;
     }
@@ -177,7 +179,13 @@ public class GameView extends View{
             }
         });
 
+        JMenuItem reset = new JMenuItem("Reset");
+        reset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
+        reset.addActionListener(this.controller);
+        reset.setActionCommand("Reset");
+
         file.add(quit);
+        file.add(reset);
         menuBar.add(file);
         return menuBar;
     }
@@ -198,9 +206,18 @@ public class GameView extends View{
         return toolBar;
     }
 
+    private JPanel createTopPanel(){
+        JPanel topPanel = new JPanel();
+        JLabel titleLabel = new JLabel("Epsilon Go");
+        titleLabel.setFont(new Font(titleLabel.getFont().getName(), Font.BOLD, 40));
+        topPanel.add(titleLabel);
+        return topPanel;
+    }
+
     private JPanel createBottomPanel(){
         JPanel bottomPanel = new JPanel();
         this.currentPlayerLabel = new JLabel("Current Turn: Black");
+        this.currentPlayerLabel.setFont(new Font(this.currentPlayerLabel.getFont().getName(), Font.BOLD, 20));
         bottomPanel.add(this.currentPlayerLabel);
         return bottomPanel;
     }
@@ -210,7 +227,7 @@ public class GameView extends View{
         HashMap<TextAttribute, Integer> underlineAttributes = new HashMap<TextAttribute, Integer>();
         underlineAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
         JPanel playerPanel = new JPanel();
-        playerPanel.setPreferredSize(new Dimension(200, 800));
+        playerPanel.setPreferredSize(new Dimension(200, BOARD_SIZE));
         playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
 
         JLabel playerLabel = player == 1 ? new JLabel("Black") : new JLabel("White");
@@ -219,8 +236,8 @@ public class GameView extends View{
         playerPanel.add(playerLabel);
         playerPanel.add(Box.createRigidArea(new Dimension(20,20)));
 
-        JLabel pieces = new JLabel("Stones Left");
-        JLabel captures = new JLabel("Stones Captured");
+        JLabel pieces = new JLabel("Stones Left:");
+        JLabel captures = new JLabel("Stones Captured:");
 
         JLabel piecesCounter = new JLabel("x " + currentBoard.getPieces(player));
         JLabel capturesCounter = new JLabel("x " + currentBoard.getCaptures(player));
@@ -243,9 +260,9 @@ public class GameView extends View{
         playerPanel.add(captures);
         capturesCounter.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         playerPanel.add(capturesCounter);
-        playerPanel.add(Box.createRigidArea(new Dimension(20,20)));
+        playerPanel.add(Box.createVerticalGlue());
 
-        JButton pass = new JButton("Pass");
+        JButton pass = new JButton("Pass Turn");
         pass.setActionCommand("Pass");
         pass.addActionListener(this.controller);
         pass.setAlignmentX(JButton.CENTER_ALIGNMENT);
@@ -291,13 +308,13 @@ public class GameView extends View{
         this.glassPanel.setVisible(false);
         this.glassPanel.addMouseListener(new MouseAdapter() {});
         this.glassPanel.setFocusable(true);
-        this.glassPanel.setPreferredSize(new Dimension(800,800));
+        this.glassPanel.setPreferredSize(new Dimension(BOARD_SIZE,BOARD_SIZE));
         this.glassPanel.setSize(this.glassPanel.getPreferredSize());
     }
 
     private JLayeredPane createLayeredPane(JPanel boardPanel, JPanel glassPanel){
         JLayeredPane layeredPanel = new JLayeredPane();
-        layeredPanel.setPreferredSize(new Dimension(800,800));
+        layeredPanel.setPreferredSize(new Dimension(BOARD_SIZE,BOARD_SIZE));
         layeredPanel.add(boardPanel, JLayeredPane.DEFAULT_LAYER);
         layeredPanel.add(glassPanel, JLayeredPane.PALETTE_LAYER);
         return layeredPanel;
@@ -309,7 +326,7 @@ public class GameView extends View{
         
         JPanel jPanel = new JPanel();
         jPanel.setLayout(new BorderLayout());
-        jPanel.add(this.createToolBar(), BorderLayout.NORTH);
+        jPanel.add(this.createTopPanel(), BorderLayout.NORTH);
         this.blackPanel = createPlayerPanel(1, currentBoard);
         this.whitePanel = createPlayerPanel(2, currentBoard);
         jPanel.add(this.blackPanel, BorderLayout.LINE_START);
