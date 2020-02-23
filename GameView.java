@@ -1,7 +1,10 @@
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -30,8 +33,15 @@ public class GameView extends View{
     private String[] fileNames = {"north-west", "north", "north-east", "west", "center", "east", "south-west", "south", "south-east", "dot"};
     private GameController controller;
     private ArrayList<ArrayList<JButton>> boardButtons;
+    private ArrayList<HashMap<String, JComponent>> playerComponents = new ArrayList<HashMap<String, JComponent>>(); 
 
     JPanel glassPanel = new JPanel();
+    JPanel blackPanel;
+    JPanel whitePanel;
+
+    
+    Icon black = new ImageIcon("assets/img/black.png");
+    Icon white = new ImageIcon("assets/img/white.png");
 
     public GameView(GameController controller){
         this.controller = controller;
@@ -184,13 +194,69 @@ public class GameView extends View{
         return toolBar;
     }
 
-    private JPanel createPlayerPanel(){
+    private JPanel createPlayerPanel(int player, GoBoard currentBoard){
+        HashMap<String, JComponent> components = new HashMap<String, JComponent>();
         JPanel playerPanel = new JPanel();
         playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
-        JButton pass = new JButton("Pass");
 
+        JLabel playerLabel = player == 1 ? new JLabel("Black") : new JLabel("White");
+        playerPanel.add(playerLabel);
+
+        JLabel pieces = new JLabel("<HTML><U>Strones Left</U></HTML>");
+        JLabel captures = new JLabel("<HTML><U>Strones Captured</U></HTML>");
+
+        JLabel piecesCounter = new JLabel("x " + currentBoard.getPieces(player));
+        JLabel capturesCounter = new JLabel("x " + currentBoard.getCaptures(player));
+        if(player == 1){
+            piecesCounter.setIcon(this.black);
+            capturesCounter.setIcon(this.white);
+        }
+        else{
+            piecesCounter.setIcon(this.white);
+            capturesCounter.setIcon(this.black);
+        }
+        playerPanel.add(pieces);
+        playerPanel.add(piecesCounter);
+        playerPanel.add(captures);
+        playerPanel.add(capturesCounter);
+
+        JButton pass = new JButton("Pass");
+        pass.setActionCommand("Pass");
+        pass.addActionListener(this.controller);
         playerPanel.add(pass);
+
+        components.put("Pieces", piecesCounter);
+        components.put("Captures", capturesCounter);
+        components.put("Pass", pass);
+        this.playerComponents.add(components);
+
         return playerPanel;
+    }
+
+    public void updatePlayerPanel(int player, GoBoard currentBoard){
+        System.out.println(player + "");
+        HashMap<String, JComponent> components = this.playerComponents.get(player - 1);
+        JLabel pieces = (JLabel)components.get("Pieces");
+        JLabel captures = (JLabel)components.get("Captures");
+        pieces.setText("x " + currentBoard.getPieces(player));
+        captures.setText("x " + currentBoard.getCaptures(player));
+
+    }
+
+    public void setActivePlayer(int activePlayer){
+        //Enable active players pass button
+        HashMap<String, JComponent> components = this.playerComponents.get(activePlayer - 1);
+        JButton pass = (JButton)components.get("Pass");
+        pass.setEnabled(true);
+
+        //Disable inactive player's pass button
+        int inavtivePlayer = activePlayer == 1 ? 2 : 1;
+        components = this.playerComponents.get(inavtivePlayer - 1);
+        pass = (JButton)components.get("Pass");
+        pass.setEnabled(false);
+
+        //Display active player
+
     }
 
     private void createGlassPanel(){
@@ -217,12 +283,15 @@ public class GameView extends View{
         JPanel jPanel = new JPanel();
         jPanel.setLayout(new BorderLayout());
         jPanel.add(this.createToolBar(), BorderLayout.NORTH);
-        jPanel.add(createPlayerPanel(), BorderLayout.LINE_START);
-        jPanel.add(createPlayerPanel(), BorderLayout.LINE_END);
+        this.blackPanel = createPlayerPanel(1, currentBoard);
+        this.whitePanel = createPlayerPanel(2, currentBoard);
+        jPanel.add(this.blackPanel, BorderLayout.LINE_START);
+        jPanel.add(this.whitePanel, BorderLayout.LINE_END);
 
         createGlassPanel();
         jPanel.add(createLayeredPane(createBoardPanel(currentBoard), this.glassPanel), BorderLayout.CENTER);
 
+        this.setActivePlayer(currentBoard.getCurrentPlayer());
         jFrame.add(jPanel, BorderLayout.CENTER);
         jFrame.pack();
         jFrame.setVisible(true);

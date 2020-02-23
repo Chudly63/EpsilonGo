@@ -7,11 +7,24 @@ public class GoBoard extends Model implements Serializable {
     
     private static final long serialVersionUID = 1L;
     private List<List<Space>> spaces;
+    private List<Integer> pieces;
+    private List<Integer> captures;
+    private int sideLength;
+    private int currentPlayer;
     private HashSet<Space> visited;
 
 
     //9, 15, or 19
     public GoBoard(int sideLength){
+        this.sideLength = sideLength;
+        this.currentPlayer = 1;
+        this.pieces = new ArrayList<Integer>();
+        this.captures = new ArrayList<Integer>();
+
+        this.captures.add(Integer.valueOf(0));
+        this.captures.add(Integer.valueOf(0));
+        this.pieces.add(Integer.valueOf(sideLength * sideLength / 2 + 1));
+        this.pieces.add(Integer.valueOf(sideLength * sideLength / 2));
 
         this.spaces = new ArrayList<List<Space>>();
         for(int i = 0; i < sideLength; i++){
@@ -29,6 +42,11 @@ public class GoBoard extends Model implements Serializable {
                 space.setValue(0);
             }
         }
+        this.pieces.set(0, Integer.valueOf(this.sideLength * this.sideLength / 2 + 1));
+        this.pieces.set(1, Integer.valueOf(this.sideLength * this.sideLength / 2));
+        this.captures.set(0, Integer.valueOf(0));
+        this.captures.set(1, Integer.valueOf(0));
+        this.currentPlayer = 1;
     }
 
 
@@ -55,8 +73,44 @@ public class GoBoard extends Model implements Serializable {
         this.spaces.get(x).set(y, space);
     }
 
+    public int getPieces(int player){
+        return this.pieces.get(player - 1);
+    }
+
+    public int getCaptures(int player){
+        return this.captures.get(player - 1);
+    }
+
+    public void setPieces(int player, int pieces){
+        this.pieces.set(player - 1, Integer.valueOf(pieces));
+    }
+
+    public void setCaptures(int player, int captures){
+        this.captures.set(player - 1, Integer.valueOf(captures));
+    }
+
+    public void addPieces(int player, int pieces){
+        this.pieces.set(player - 1, Integer.valueOf(getPieces(player) + pieces));
+    }
+
+    public void addCaptures(int player, int captures){
+        this.captures.set(player - 1, Integer.valueOf(getCaptures(player) + captures));
+    }
+
     public int getBoardLength(){
         return this.spaces.size();
+    }
+
+    public int getCurrentPlayer(){
+        return this.currentPlayer;
+    }
+
+    public int getOtherPlayer(){
+        return this.currentPlayer == 1 ? 2 : 1;
+    }
+
+    public void changePlayer(){
+        this.currentPlayer = this.getOtherPlayer();
     }
 
     public void updateLiberties(){

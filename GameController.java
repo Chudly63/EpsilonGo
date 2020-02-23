@@ -1,5 +1,4 @@
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +10,10 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
 
-public class GameController extends Controller implements ActionListener{
+public class GameController extends Controller{
     private GoBoard board;
     private GameView view;
-    private int currentPlayer = 1;
+    private boolean passLastTurn = false;
 
     public GameController(Model model){
         board = (GoBoard)model;
@@ -23,6 +22,7 @@ public class GameController extends Controller implements ActionListener{
     public void setView(View view){
         this.view = (GameView)view;
     }
+
 
     public void playPieceSound(int sound){
         Clip clip;
@@ -37,6 +37,11 @@ public class GameController extends Controller implements ActionListener{
             e.printStackTrace();
         }
     }
+
+    public void changePlayer(){
+        this.board.changePlayer();
+        this.view.setActivePlayer(this.board.getCurrentPlayer());
+    }
  
     public void actionPerformed(ActionEvent e){
         System.out.println(e.getActionCommand());
@@ -44,24 +49,42 @@ public class GameController extends Controller implements ActionListener{
         if(e.getActionCommand().equals("Update")){
             List<Space> collectedSpaces = board.collectCaptures();
             playPieceSound(2);
+            board.addCaptures(board.getOtherPlayer(), collectedSpaces.size());
             board.updateLiberties();
             view.updateBoardPanel(board, collectedSpaces);
+            view.updatePlayerPanel(board.getOtherPlayer(), board);
         }
         else if(e.getActionCommand().equals("Reset")){
             board.resetBoard();
-            currentPlayer = 1;
             view.updateBoardPanel(board, board.getAllSpaces());
+            view.updatePlayerPanel(1, board);
+            view.updatePlayerPanel(2, board);
+            view.setActivePlayer(board.getCurrentPlayer());
+        }
+        else if(e.getActionCommand().equals("Pass")){
+            if(passLastTurn){
+                System.out.println("Game Ends");
+                return;
+            }
+            this.changePlayer();
+            passLastTurn = true;
         }
         else{
-            int otherPlayer = currentPlayer == 1 ? 2 : 1;
             int x = Integer.parseInt(e.getActionCommand().split(":")[0]);
             int y = Integer.parseInt(e.getActionCommand().split(":")[1]);
             List<Space> spacesToUpdate = new ArrayList<Space>();
             List<Space> captures;
+
+            if(board.getPieces(board.getCurrentPlayer()) == 0){
+                System.out.println("Out of pieces");
+                playPieceSound(3);
+                return;
+            }
+
             Space selected = board.getSpace(x,y);
 
-            selected.setValue(currentPlayer);
-            captures = board.highlightCaptures(otherPlayer);
+            selected.setValue(board.getCurrentPlayer());
+            captures = board.highlightCaptures(board.getOtherPlayer());
 
             if(board.getLiberties(x,y).size() == 0 && captures.size() == 0){
                 System.out.println("Suicide");
@@ -69,11 +92,13 @@ public class GameController extends Controller implements ActionListener{
                 selected.setValue(0);
                 return;
             }
+            board.addPieces(board.getCurrentPlayer(), -1);
             playPieceSound(1);
+            passLastTurn = false;
 
             ((JButton) e.getSource()).setEnabled(false);
-
-            currentPlayer = otherPlayer;
+            view.updatePlayerPanel(board.getCurrentPlayer(), board);
+            this.changePlayer();
             board.updateLiberties();
 
             spacesToUpdate.add(selected);

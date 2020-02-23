@@ -1,5 +1,5 @@
 public class Main{
-    static GoBoard board = new GoBoard(15);
+    static GoBoard board = new GoBoard(9);
     static private GameController gameController = new GameController(board);
     static GameView view = new GameView(gameController);
 
