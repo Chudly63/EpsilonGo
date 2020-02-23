@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -11,7 +12,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
@@ -25,13 +25,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.font.TextAttribute;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class GameView extends View{
 
-    private int BOARD_SIZE = 600;
+    private int BOARD_SIZE = 700;
 
     private HashMap<String, ArrayList<ImageIcon>> ICONS = new HashMap<String, ArrayList<ImageIcon>>();
     private String[] fileNames = {"north-west", "north", "north-east", "west", "center", "east", "south-west", "south", "south-east", "dot"};
@@ -190,6 +191,7 @@ public class GameView extends View{
         return menuBar;
     }
 
+    /*
     private JToolBar createToolBar(){
         JToolBar toolBar = new JToolBar();
         JButton quitBtn = new JButton("Q");
@@ -205,6 +207,7 @@ public class GameView extends View{
         toolBar.add(resetBtn);
         return toolBar;
     }
+    */
 
     private JPanel createTopPanel(){
         JPanel topPanel = new JPanel();
@@ -322,6 +325,11 @@ public class GameView extends View{
 
     public void showView(GoBoard currentBoard){
         JFrame jFrame = new JFrame("EpsilonGo");
+        try{
+            jFrame.setIconImage(ImageIO.read(new File("assets/img/center-b.png")));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         jFrame.setJMenuBar(this.createMenu());
         
         JPanel jPanel = new JPanel();
