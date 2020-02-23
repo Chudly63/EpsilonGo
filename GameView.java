@@ -1,3 +1,4 @@
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -16,13 +17,14 @@ import javax.swing.Timer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
-
+import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -205,14 +207,20 @@ public class GameView extends View{
 
     private JPanel createPlayerPanel(int player, GoBoard currentBoard){
         HashMap<String, JComponent> components = new HashMap<String, JComponent>();
+        HashMap<TextAttribute, Integer> underlineAttributes = new HashMap<TextAttribute, Integer>();
+        underlineAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
         JPanel playerPanel = new JPanel();
+        playerPanel.setPreferredSize(new Dimension(200, 800));
         playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
 
         JLabel playerLabel = player == 1 ? new JLabel("Black") : new JLabel("White");
+        playerLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        playerLabel.setFont(new Font(playerLabel.getFont().getName(), Font.BOLD, 20));
         playerPanel.add(playerLabel);
+        playerPanel.add(Box.createRigidArea(new Dimension(20,20)));
 
-        JLabel pieces = new JLabel("<HTML><U>Strones Left</U></HTML>");
-        JLabel captures = new JLabel("<HTML><U>Strones Captured</U></HTML>");
+        JLabel pieces = new JLabel("Stones Left");
+        JLabel captures = new JLabel("Stones Captured");
 
         JLabel piecesCounter = new JLabel("x " + currentBoard.getPieces(player));
         JLabel capturesCounter = new JLabel("x " + currentBoard.getCaptures(player));
@@ -224,14 +232,23 @@ public class GameView extends View{
             piecesCounter.setIcon(this.white);
             capturesCounter.setIcon(this.black);
         }
+        pieces.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        pieces.setFont(new Font(pieces.getFont().getName(), Font.BOLD, 16).deriveFont(underlineAttributes));
         playerPanel.add(pieces);
+        piecesCounter.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         playerPanel.add(piecesCounter);
+        playerPanel.add(Box.createRigidArea(new Dimension(20,20)));
+        captures.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        captures.setFont(new Font(pieces.getFont().getName(), Font.BOLD, 16).deriveFont(underlineAttributes));
         playerPanel.add(captures);
+        capturesCounter.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         playerPanel.add(capturesCounter);
+        playerPanel.add(Box.createRigidArea(new Dimension(20,20)));
 
         JButton pass = new JButton("Pass");
         pass.setActionCommand("Pass");
         pass.addActionListener(this.controller);
+        pass.setAlignmentX(JButton.CENTER_ALIGNMENT);
         playerPanel.add(pass);
 
         components.put("Pieces", piecesCounter);
