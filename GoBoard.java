@@ -13,11 +13,18 @@ public class GoBoard extends Model implements Serializable {
     private int currentPlayer;
     private HashSet<Space> visited;
 
+    private double komi;
+    private String blackName;
+    private String whiteName;
+
 
     //9, 15, or 19
-    public GoBoard(int sideLength){
+    public GoBoard(int sideLength, double komi, String blackName, String whiteName){
         this.sideLength = sideLength;
         this.currentPlayer = 1;
+        this.komi = komi;
+        this.blackName = blackName;
+        this.whiteName = whiteName;
         this.pieces = new ArrayList<Integer>();
         this.captures = new ArrayList<Integer>();
 
@@ -111,6 +118,14 @@ public class GoBoard extends Model implements Serializable {
 
     public void changePlayer(){
         this.currentPlayer = this.getOtherPlayer();
+    }
+
+    public String getPlayerName(int player){
+        return player == 1 ? this.blackName : this.whiteName;
+    }
+
+    public double getKomi(){
+        return this.komi;
     }
 
     public void updateLiberties(){

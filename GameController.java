@@ -40,7 +40,7 @@ public class GameController extends Controller{
 
     public void changePlayer(){
         this.board.changePlayer();
-        this.view.setActivePlayer(this.board.getCurrentPlayer());
+        this.view.setActivePlayer(this.board.getCurrentPlayer(), this.board);
     }
  
     public void actionPerformed(ActionEvent e){
@@ -59,7 +59,7 @@ public class GameController extends Controller{
             view.updateBoardPanel(board, board.getAllSpaces());
             view.updatePlayerPanel(1, board);
             view.updatePlayerPanel(2, board);
-            view.setActivePlayer(board.getCurrentPlayer());
+            view.setActivePlayer(board.getCurrentPlayer(), this.board);
             passLastTurn = false;
         }
         else if(e.getActionCommand().equals("Pass")){

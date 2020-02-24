@@ -233,7 +233,7 @@ public class GameView extends View{
         playerPanel.setPreferredSize(new Dimension(200, BOARD_SIZE));
         playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
 
-        JLabel playerLabel = player == 1 ? new JLabel("Black") : new JLabel("White");
+        JLabel playerLabel = new JLabel(currentBoard.getPlayerName(player));
         playerLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         playerLabel.setFont(new Font(playerLabel.getFont().getName(), Font.BOLD, 20));
         playerPanel.add(playerLabel);
@@ -289,7 +289,7 @@ public class GameView extends View{
 
     }
 
-    public void setActivePlayer(int activePlayer){
+    public void setActivePlayer(int activePlayer, GoBoard currentBoard){
         //Enable active players pass button
         HashMap<String, JComponent> components = this.playerComponents.get(activePlayer - 1);
         JButton pass = (JButton)components.get("Pass");
@@ -302,7 +302,7 @@ public class GameView extends View{
         pass.setEnabled(false);
 
         //Display active player
-        String currentPlayerText = activePlayer == 1 ? "Current Player: Black" : "Current Player: White";
+        String currentPlayerText = "Current Player: " + currentBoard.getPlayerName(activePlayer);
         this.currentPlayerLabel.setText(currentPlayerText);
     }
 
@@ -344,7 +344,7 @@ public class GameView extends View{
         createGlassPanel();
         jPanel.add(createLayeredPane(createBoardPanel(currentBoard), this.glassPanel), BorderLayout.CENTER);
 
-        this.setActivePlayer(currentBoard.getCurrentPlayer());
+        this.setActivePlayer(currentBoard.getCurrentPlayer(), currentBoard);
         jFrame.add(jPanel, BorderLayout.CENTER);
         jFrame.pack();
         jFrame.setVisible(true);
