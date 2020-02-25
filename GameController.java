@@ -65,6 +65,9 @@ public class GameController extends Controller{
         else if(e.getActionCommand().equals("Pass")){
             if(passLastTurn){
                 System.out.println("Game Ends");
+                System.out.println(this.board.getScores());
+                ScoreView scoreView = new ScoreView();
+                scoreView.showView(this.board);
                 return;
             }
             this.changePlayer();

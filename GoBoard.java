@@ -202,6 +202,16 @@ public class GoBoard extends Model implements Serializable {
         return captures;
     }
 
+    public List<Double> getScores(){
+        ArrayList<Double> scores = new ArrayList<Double>();
+        //TODO: Implement Scoring
+
+        //Dummy Values
+        scores.add(4.0);
+        scores.add(2 + this.komi);
+        return scores;
+    }
+
     public String toString(){
         String rebound = "\nCurrent Board: \n";
         for(int i = 0; i < this.spaces.size(); i++){
