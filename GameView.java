@@ -172,6 +172,7 @@ public class GameView extends View{
         JMenuBar menuBar = new JMenuBar();
         JMenu file = new JMenu("File");
         file.setMnemonic(KeyEvent.VK_F);
+
         JMenuItem quit = new JMenuItem("Quit");
         quit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK));
         quit.addActionListener(new ActionListener(){
@@ -185,9 +186,38 @@ public class GameView extends View{
         reset.addActionListener(this.controller);
         reset.setActionCommand("Reset");
 
+        JMenuItem save = new JMenuItem("Save");
+        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+        save.addActionListener(this.controller);
+        save.setActionCommand("Save");
+
+        JMenuItem load = new JMenuItem("Load");
+        load.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
+        load.addActionListener(this.controller);
+        load.setActionCommand("Load");
+
         file.add(quit);
         file.add(reset);
+        file.add(save);
+        file.add(load);
+
+
+        JMenu help = new JMenu("Help");
+        help.setMnemonic(KeyEvent.VK_H);
+
+        JMenuItem about = new JMenuItem("About");
+        about.addActionListener(this.controller);
+        about.setActionCommand("About");
+
+        JMenuItem rules = new JMenuItem("Rules");
+        rules.addActionListener(this.controller);
+        rules.setActionCommand("Rules");
+
+        help.add(about);
+        help.add(rules);
+
         menuBar.add(file);
+        menuBar.add(help);
         return menuBar;
     }
 
