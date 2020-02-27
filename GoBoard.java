@@ -207,8 +207,8 @@ public class GoBoard extends Model implements Serializable {
         //TODO: Implement Scoring
 
         //Dummy Values
-        scores.add(4.0);
-        scores.add(2 + this.komi);
+        scores.add(0.0);
+        scores.add(0 + this.komi);
         return scores;
     }
 

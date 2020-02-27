@@ -6,7 +6,6 @@ public class Main{
     public static void main(String [] args){
         gameController.setView(view);
         view.showView(board);
-        board.updateLiberties();
     }
 
 }
