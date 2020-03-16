@@ -222,34 +222,23 @@ public class GameView{
         save.addActionListener(this.controller);
         save.setActionCommand("Save");
 
-<<<<<<< HEAD:src/screens/GameView.java
 
-=======
->>>>>>> 4d5fd497d12ce4669a9ed7df4d7724829042aa73:GameView.java
         JMenuItem load = new JMenuItem("Load");
         load.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
         load.addActionListener(this.controller);
         load.setActionCommand("Load");
 
-<<<<<<< HEAD:src/screens/GameView.java
 
         file.add(save);
         file.add(load);
         file.add(reset);
         file.add(quit);
-=======
-        file.add(quit);
-        file.add(reset);
-        file.add(save);
-        file.add(load);
->>>>>>> 4d5fd497d12ce4669a9ed7df4d7724829042aa73:GameView.java
 
 
         JMenu help = new JMenu("Help");
         help.setMnemonic(KeyEvent.VK_H);
 
         JMenuItem about = new JMenuItem("About");
-<<<<<<< HEAD:src/screens/GameView.java
         about.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) { 
 				Point p = jFrame.getLocation();
@@ -265,14 +254,6 @@ public class GameView{
 				rules r = new rules(null);
 			}
 		});
-=======
-        about.addActionListener(this.controller);
-        about.setActionCommand("About");
-
-        JMenuItem rules = new JMenuItem("Rules");
-        rules.addActionListener(this.controller);
-        rules.setActionCommand("Rules");
->>>>>>> 4d5fd497d12ce4669a9ed7df4d7724829042aa73:GameView.java
 
         help.add(about);
         help.add(rules);
