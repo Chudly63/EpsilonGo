@@ -291,6 +291,7 @@ public class GoBoard implements Serializable {
     	return count;
     }
 
+<<<<<<< HEAD:src/board/GoBoard.java
     public void updateScores(){
         this.scores = new ArrayList<Double>();
         
@@ -300,6 +301,16 @@ public class GoBoard implements Serializable {
         
         this.scores.add(blackScore);
         this.scores.add(whiteScore);
+=======
+    public List<Double> getScores(){
+        ArrayList<Double> scores = new ArrayList<Double>();
+        //TODO: Implement Scoring
+
+        //Dummy Values
+        scores.add(0.0);
+        scores.add(0 + this.komi);
+        return scores;
+>>>>>>> 4d5fd497d12ce4669a9ed7df4d7724829042aa73:GoBoard.java
     }
 
     public String toString(){
